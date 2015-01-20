@@ -12,49 +12,104 @@ for (var y = 0.5; y < 541; y += 54) {
     ctx.lineTo(540, y);
 }
 
-//ctx.strokeStyle = "#ddd";
 ctx.stroke();
 
-(function () {
+var battleship = (function () {
 
-    var battleship = [
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 1]
+    var field = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ];
-    //var battleship = [
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    //];
 
-
-
-    battleship.forEach(function (row, rowIndex) {
-        row.forEach(function (item, columnIndex) {
-            if (item) {
-                drawSquare(rowIndex, columnIndex)
+    function canPlace(x, y) {
+        for(var i = x - 1; i <= x + 1; i++) {
+            for (var j = y - 1; j <= y + 1; j++) {
+                if (!field[j] || typeof field[j][i] == 'undefined' || field[j][i] === 1) {
+                    return false;
+                }
             }
-        })
-    });
-
-    function drawSquare(rowIndex, columnIndex) {
-        ctx.fillRect(columnIndex * 54 + 2, rowIndex * 54 + 2, 50, 50);
-        ctx.stroke();
+        }
+        return true;
     }
 
+    return {
+        drawShip: function (items) {
+            //while (true) {
+                var randomX = Math.floor(Math.random() * 10);
+                var randomY = Math.floor(Math.random() * 10);
+                var toX = getRandomInt(0, 1);
+                var toY = toX ? 0 : 1;
+
+                var values = [];
+                for(var i = 0; i < items; i++) {
+                    var x = randomX + i * toX;
+                    var y = randomY + i * toY;
+                    if (canPlace(x, y)) {
+                        values.push({
+                            x: x,
+                            y: y
+                        })
+                    }
+                }
+
+                if (values.length === items) {
+                    values.forEach(function (value) {
+                        field[value.y][value.x] = 1
+                    });
+                    return;
+                    //break;
+                } else {
+                    this.drawShip(items)
+                }
+            //}
+        },
+
+        render: function () {
+            console.log(canPlace(1,1))
+            field.forEach(function (row, rowIndex) {
+                row.forEach(function (item, columnIndex) {
+                    if (item) {
+                        drawSquare(rowIndex, columnIndex)
+                    }
+                })
+            });
+
+            ctx.stroke();
+        }
+    };
+
+    function drawSquare(x, y) {
+        ctx.fillRect(y * 54 + 2, x * 54 + 2, 50, 50);
+    }
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 }());
+
+battleship.drawShip(4);
+
+battleship.drawShip(3);
+battleship.drawShip(3);
+
+battleship.drawShip(2);
+battleship.drawShip(2);
+battleship.drawShip(2);
+
+battleship.drawShip(1);
+battleship.drawShip(1);
+battleship.drawShip(1);
+battleship.drawShip(1);
+
+battleship.render();
+
+
+
